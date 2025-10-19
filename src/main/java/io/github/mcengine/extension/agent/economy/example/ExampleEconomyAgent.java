@@ -2,7 +2,7 @@ package io.github.mcengine.extension.agent.economy.example;
 
 import io.github.mcengine.api.core.MCEngineCoreApi;
 import io.github.mcengine.api.core.extension.logger.MCEngineExtensionLogger;
-import io.github.mcengine.api.economy.extension.api.IMCEngineEconomyAPI;
+import io.github.mcengine.api.economy.extension.agent.IMCEngineEconomyAgent;
 
 import io.github.mcengine.extension.agent.economy.example.command.EconomyAgentCommand;
 import io.github.mcengine.extension.agent.economy.example.listener.EconomyAgentListener;
@@ -21,11 +21,9 @@ import java.lang.reflect.Field;
  * Main class for the Economy <b>Agent</b> example module.
  * <p>
  * Registers the {@code /economyagentexample} command and related event listeners.
- * <p>
- * Migrated from the previous “API” naming to “Agent” while preserving
- * {@link IMCEngineEconomyAPI} integration for compatibility.
+ * Integrates with the {@link IMCEngineEconomyAgent} lifecycle.
  */
-public class ExampleEconomyAgent implements IMCEngineEconomyAPI {
+public class ExampleEconomyAgent implements IMCEngineEconomyAgent {
 
     /** Custom extension logger for this module, with contextual labeling. */
     private MCEngineExtensionLogger logger;
