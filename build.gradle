@@ -1,0 +1,86 @@
+plugins {
+    id 'com.gradleup.shadow' version '9.2.2'
+    id 'java'
+}
+
+ext {
+    user_git_name = System.getenv('USER_GIT_NAME')
+    user_git_token = System.getenv('USER_GIT_TOKEN')
+
+    // GitHub
+    user_github_name = System.getenv('USER_GITHUB_NAME')
+    user_github_token = System.getenv('USER_GITHUB_TOKEN')
+
+    // Organization
+    organization_id = System.getenv('ORGANIZATION_ID')
+    organization_name = System.getenv('ORGANIZATION_NAME') ?: 'MCEngine-Extension'
+    organization_token = System.getenv('ORGANIZATION_TOKEN')
+
+    // Repository
+    repository_id = System.getenv('REPOSITORY_ID')
+    repository_name = System.getenv('REPOSITORY_NAME') ?: 'economy-agent-example'
+    repository_token = System.getenv('REPOSITORY_TOKEN')
+
+    jarName = System.getenv('PROJECT_NAME') ?: 'EconomyExampleAgent'
+}
+
+// Set project version using a property
+version = project.properties[project.name + '.version']
+group = 'io.github.mcengine'
+
+allprojects {
+    group = 'io.github.mcengine'
+
+    apply plugin: 'java'
+    apply plugin: 'com.gradleup.shadow'
+
+    repositories {
+        ext.configureGitHubRepo = { repoName, repoUrl ->
+            maven {
+                name = repoName
+                url = uri(repoUrl)
+                credentials {
+                    username = user_git_name ?: user_github_name ?: repository_name ?: organization_name
+                    password = user_git_token ?: user_github_token ?: repository_token ?: organization_token
+                }
+            }
+        }
+
+        configureGitHubRepo('MCEngine Core API', 'https://maven.pkg.github.com/MCEngine-API/core')
+        configureGitHubRepo('MCEngine Economy Api', 'https://maven.pkg.github.com/MCEngine-API/economy')
+        configureGitHubRepo('MCEngine Economy Common', 'https://maven.pkg.github.com/MCEngine-Common/economy')
+
+        mavenCentral()
+        mavenLocal()
+
+        maven {
+            url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots'
+            content {
+                includeGroup 'org.bukkit'
+                includeGroup 'org.spigotmc'
+            }
+        }
+
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url 'https://oss.sonatype.org/content/repositories/central' }
+    }
+}
+
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.21.10-R0.1-SNAPSHOT'
+
+    compileOnly 'io.github.mcengine:core-api:2025.1.0-18'
+    compileOnly 'io.github.mcengine:economy-api:2025.1.0-18'
+    compileOnly 'io.github.mcengine:economy-common:2025.1.0-18'
+}
+
+shadowJar {
+    archiveClassifier = null
+    archiveBaseName = jarName
+}
+
+tasks.named('jar').configure {
+    enabled = false
+}
+
+build.dependsOn(shadowJar)
